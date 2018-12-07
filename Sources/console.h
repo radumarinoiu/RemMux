@@ -18,4 +18,8 @@ int console_move(int, int, int, int);
 int console_switch(int, int);
 void rebuild_screen_grid();
 
+void console_create_cmd();
+void console_delete_cmd();
+void console_select_cmd();
+
 #endif //REMMUX_CONSOLE_H
