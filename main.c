@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include <ncurses.h>
-#include "Headers/constants.h"
-#include "Headers/client.h"
 
-struct window_obj{
-    int height, width, starty, startx;
-    WINDOW *handle;
-};
+#include "Sources/client.h"
+#include "Sources/console.h"
+#include "Sources/constants.h"
+#include "Sources/server.h"
 
 int main() {
-    initscr();
-
+    console_main();
+    getch();
     return 0;
 }

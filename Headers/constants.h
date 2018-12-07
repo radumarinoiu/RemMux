@@ -1,1 +1,0 @@
-const int CONSOLE_H = 60, CONSOLE_W = 120;
