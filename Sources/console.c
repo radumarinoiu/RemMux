@@ -24,7 +24,7 @@ int console_main(){
     noecho();
     keypad(stdscr, TRUE);
     cbreak();
-    timeout(50);
+    timeout(100);
     while(RUN){
         input = getch();
         if(input != ERR){
@@ -69,34 +69,47 @@ int console_main(){
             }
             cmd_len = 0; execute_cmd = 0;
         }
-        refresh();
     }
 }
 
 void rebuild_screen_grid(){
-    int rows = 0, columns = 0;
-    int horizontal_fit_windows_count = CONSOLE_W/MIN_WINDOW_WIDTH;
-    if(window_count > MIN_WINDOW_WIDTH)
-    refresh();
+    int rows = 0, cols = 0;
+    while(rows*cols < window_count)
+        if(cols > rows)
+            rows++;
+        else
+            cols++;
+    for(int i = 0; i < rows; i++)
+        for(int j = 0; j < cols && i*cols + j < window_count; j++) {
+            console_update(i * cols + j,
+                    CONSOLE_H / rows,
+                    CONSOLE_W / cols,
+                    CONSOLE_H / rows * i,
+                    CONSOLE_W / cols * j);
+        }
+    for(int i = 0; i < window_count; i++){
+        mvwprintw(Windows[i], 1, 1, "Window: %d", i);
+        wrefresh(Windows[i]);
+    }
 }
 
-WINDOW *console_create(WINDOW *con, int height, int width, int starty, int startx){
-    if(con != NULL){
-        mvwin(con, starty, startx);
-        wresize(con, height, width);
-        box(con, 0, 0);
-        wrefresh(con);
-    }
-    else{
-        con = newwin(height, width, starty, startx);
-        box(con, 0, 0);
-        wrefresh(con);
-    }
-    return con;
+void console_create(int height, int width, int starty, int startx){
+    Windows[window_count] = newwin(height, width, starty, startx);
+    box(Windows[window_count], 0, 0);
+    ++window_count;
+}
+
+void console_update(int id, int height, int width, int starty, int startx){
+    werase(Windows[id]);
+    Windows[id] = newwin(height, width, starty, startx);
+    //wresize(Windows[id], height, width);
+    //mvwin(Windows[id], starty, startx);
+    box(Windows[id], 0, 0);
 }
 
 void console_create_cmd(){
-
+    console_create(0, 0, 0, 0);
+    rebuild_screen_grid();
 }
 void console_delete_cmd(){
 
