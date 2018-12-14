@@ -101,10 +101,7 @@ void console_create(int height, int width, int starty, int startx){
 }
 
 void console_update(int id, int height, int width, int starty, int startx){
-//    werase(Windows[id]);
     Windows[id] = newwin(height, width, starty, startx);
-//    wresize(Windows[id], height, width);
-//    mvwin(Windows[id], starty, startx);
     box(Windows[id], 0, 0);
     refresh();
     wrefresh(Windows[id]);
