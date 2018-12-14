@@ -79,6 +79,7 @@ void rebuild_screen_grid(){
             rows++;
         else
             cols++;
+    erase();
     for(int i = 0; i < rows; i++)
         for(int j = 0; j < cols && i*cols + j < window_count; j++) {
             console_update(i * cols + j,
@@ -100,11 +101,13 @@ void console_create(int height, int width, int starty, int startx){
 }
 
 void console_update(int id, int height, int width, int starty, int startx){
-    werase(Windows[id]);
+//    werase(Windows[id]);
     Windows[id] = newwin(height, width, starty, startx);
-    //wresize(Windows[id], height, width);
-    //mvwin(Windows[id], starty, startx);
+//    wresize(Windows[id], height, width);
+//    mvwin(Windows[id], starty, startx);
     box(Windows[id], 0, 0);
+    refresh();
+    wrefresh(Windows[id]);
 }
 
 void console_create_cmd(){
