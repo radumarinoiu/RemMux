@@ -5,6 +5,5 @@
 #ifndef REMMUX_CLIENT_H
 #define REMMUX_CLIENT_H
 
-int client_main();
 
 #endif //REMMUX_CLIENT_H

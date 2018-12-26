@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.12)
-project(RemMux C)
+cmake_minimum_required(VERSION 3.13)
+project(RemMux)
 
-set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
-add_executable(RemMux main.c Sources/constants.h Sources/client.c Sources/client.h Sources/server.c Sources/server.h Sources/console.c Sources/console.h)
+add_executable(RemMux src/constants.h src/client.cpp src/client.h src/server.cpp src/server.h)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})

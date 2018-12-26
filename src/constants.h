@@ -11,4 +11,10 @@
 #define CONSOLE_W 220
 #define MAX_WINDOWS 25
 
+enum MyProtocol {
+    INITIATE_SHUTDOWN,
+    HEARTBEAT,
+    CREATE_SESSION
+};
+
 #endif //REMMUX_CONSTANTS_H
