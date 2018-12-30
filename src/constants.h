@@ -21,4 +21,9 @@
 #define PROTOCOL_CREATE_SESSION 2
 #define PROTOCOL_STREAM 3
 
+struct WINDOW_DESC{
+    int y, x;
+    int width, height;
+};
+
 #endif //REMMUX_CONSTANTS_H

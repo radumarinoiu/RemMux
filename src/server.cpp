@@ -111,8 +111,10 @@ void Child::process_stream() {
             printf("%c.", recv_buffer[i]);
         printf("\n");
     }
+    if(recv_size == 0)
+        printf("Received refresh request.\n");
     read(shell_stdout[PIPE_READ], resp_buffer, BUFFER_SIZE);
-    strcat(resp_buffer, recv_buffer);
+    //strcat(resp_buffer, recv_buffer);
     resp_size = strlen(resp_buffer);
     write(sd, &resp_size, sizeof(resp_size));
     if(resp_size > 0){

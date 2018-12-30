@@ -32,6 +32,14 @@ int Client::Join_Client_Thread() {
 
 
 bool Child::create_console() {
+    child_window = newwin(cwd.height, cwd.width, cwd.y, cwd.x);
+    box(child_window, 0, 0);
+    tty_window = newwin(cwd.height-2, cwd.width-2, cwd.y+1, cwd.x+1);
+    scrollok(tty_window, true);
+    Refresh_Window();
+}
+
+void Child::resize_event() {
 
 }
 
@@ -84,47 +92,130 @@ bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO:
     }
 }
 
-Child::Child(char *address, int port, WINDOW *parent) {
+Child::Child(char *address, int port, WINDOW *parent, WINDOW_DESC w_desc) {
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = inet_addr(address);
     server.sin_port = htons(port);
     parent_window = parent;
+    cwd = w_desc;
     connect_to_server();
     create_console();
+    child_loop();
 }
 
-void Child::Draw_Call() {
+void Child::child_loop() {
+    while(run_loop){
+        bzero(output_buffer, BUFFER_SIZE);
+        input_buffer[input_pos] = getch();
+        if(input_buffer[input_pos] == ERR){
+            input_buffer[input_pos] = 0;
+            stream_screen_content("", output_buffer);
+        }
+        else{
+            switch(input_buffer[input_pos]){
+                case '\n':
+                    stream_screen_content(input_buffer, output_buffer);
+                    wprintw(tty_window, "%c", input_buffer[input_pos]);
+                    bzero(input_buffer, BUFFER_SIZE);
+                    input_pos=0;
+                    break;
+                case 7:
+                    int x, y;
+                    getyx(tty_window, y, x);
+                    if(x>0)
+                    {
+                        wmove(tty_window, y, x-1);
+                        wprintw(tty_window, " ");
+                        wmove(tty_window, y, x-1);
+                        input_buffer[input_pos] = 0;
+                        input_buffer[input_pos-1] = 0;
+                        input_pos--;
+                    }
+                    break;
+                default:
+                    stream_screen_content("", output_buffer);
+                    wprintw(tty_window, "%c", input_buffer[input_pos]);
+                    input_pos++;
+                    break;
 
+            }
+        }
+        wprintw(tty_window, "%s", output_buffer);
+        Refresh_Window();
+    }
 }
 
-void Child::Redraw_Call() {
-    Draw_Call();
+void Child::Refresh_Window() {
+    refresh();
+    wrefresh(child_window);
+    wrefresh(tty_window);
+}
+
+void Child::Redraw_Window() {
+    wclear(parent_window);
+    child_window = newwin(cwd.height, cwd.width, cwd.y, cwd.x);
+    box(child_window, 0, 0);
+    tty_window = newwin(cwd.height-2, cwd.width-2, cwd.y+1, cwd.x+1);
+    scrollok(tty_window, true);
+    Refresh_Window();
 }
 
 
 
 int main() {
-    char input[2];//[BUFFER_SIZE];
-    char output[BUFFER_SIZE];
+    char ip_address[] = "127.0.0.1";
+    WINDOW_DESC desc;
+    desc.x = 0; desc.y = 0; desc.width = 30; desc.height = 30;
     printf("Starting\n");
     initscr();
     keypad(stdscr, TRUE);
-    cbreak();
+    raw();
     noecho();
-    timeout(100);
-    sleep(2);
-    char ip_address[] = "127.0.0.1";
-    Child ch(ip_address, 8912, stdscr);
-    while(1){
-        //scanf("%[^\n]", input);
-        bzero(input, 2);
-        bzero(output, BUFFER_SIZE);
-        input[0] = getch();
-        if(input[0] == ERR)
-            input[0] = 0;
-        ch.stream_screen_content(input, output);
-        wprintw(stdscr, "%s", output);
-        refresh();
-    }
-    getchar();
+    timeout(250);
+    sleep(1);
+    Child ch(ip_address, 8912, stdscr, desc);
+//    FILE *ff = fopen("Test.txt", "w");
+//    while(run){
+//        bzero(output, BUFFER_SIZE);
+//        input[pos] = getch();
+//        if(input[pos] == ERR){
+//            input[pos] = 0;
+//            ch.stream_screen_content("", output);
+//        }
+//        else{
+//            switch(input[pos]){
+//                case '\n':
+//                    ch.stream_screen_content(input, output);
+//                    wprintw(stdscr, "%c", input[pos]);
+//                    bzero(input, BUFFER_SIZE);
+//                    pos=0;
+//                    break;
+//                case 7:
+//                    int x, y;
+//                    getyx(stdscr, y, x);
+//                    wmove(stdscr, y, x-1);
+//                    wprintw(stdscr, " ");
+//                    wmove(stdscr, y, x-1);
+//                    input[pos] = 0;
+//                    input[pos-1] = 0;
+//                    pos--;
+//                default:
+//                    ch.stream_screen_content("", output);
+//                    wprintw(stdscr, "%c", input[pos]);
+//                    pos++;
+//
+//            }
+//            if(input[pos] == '\n'){
+//            }
+//            else{
+//                ch.stream_screen_content("", output);
+//                pos++;
+//            }
+//            wprintw(stdscr, "%c", input[pos]);
+//        }
+//        fprintf(ff, "%s.", output);
+//        fflush(ff);
+//        wprintw(stdscr, "%s", output);
+//        refresh();
+//    }
 }
