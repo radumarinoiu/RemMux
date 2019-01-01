@@ -17,9 +17,7 @@
 
 
 void Client::main_loop() {
-    //Dump all stdout from pipe to child screens
-    //If any window moved, redraw screen
-    //Render all children and screen
+
 }
 
 bool Client::Start_Client() {
@@ -28,6 +26,35 @@ bool Client::Start_Client() {
 
 int Client::Join_Client_Thread() {
 
+}
+
+void Client::resize_event() {
+    int window_count = children.size();
+    int rows = 0, cols = 0;
+    int i = 0, j = 0;
+    WINDOW_DESC w_desc;
+
+    while(rows*cols < window_count)
+        if(cols > rows)
+            rows++;
+        else
+            cols++;
+
+    erase();
+    for(Child child: children){
+        if(j >= cols || i*cols + j >= window_count){
+            i++; j = 0;
+        }
+        if(i >= rows)
+            break;
+        w_desc.height = CONSOLE_H / rows;
+        w_desc.width = CONSOLE_W / cols;
+        w_desc.y = CONSOLE_H / rows * i;
+        w_desc.x = CONSOLE_W / cols * j;
+        child.Set_Pos_Size(w_desc);
+        child.resize_event();
+        j++;
+    }
 }
 
 
@@ -40,7 +67,7 @@ bool Child::create_console() {
 }
 
 void Child::resize_event() {
-
+    Redraw_Window();
 }
 
 bool Child::connect_to_server() {
@@ -98,51 +125,51 @@ Child::Child(char *address, int port, WINDOW *parent, WINDOW_DESC w_desc) {
     server.sin_port = htons(port);
     parent_window = parent;
     cwd = w_desc;
+    pipe(screen_stdin);
+    input_pipe_buffer[1] = 0;
     connect_to_server();
     create_console();
-    child_loop();
 }
 
 void Child::child_loop() {
-    while(run_loop){
-        bzero(output_buffer, BUFFER_SIZE);
-        input_buffer[input_pos] = getch();
-        if(input_buffer[input_pos] == ERR){
-            input_buffer[input_pos] = 0;
-            stream_screen_content("", output_buffer);
-        }
-        else{
-            switch(input_buffer[input_pos]){
-                case '\n':
-                    stream_screen_content(input_buffer, output_buffer);
-                    wprintw(tty_window, "%c", input_buffer[input_pos]);
-                    bzero(input_buffer, BUFFER_SIZE);
-                    input_pos=0;
-                    break;
-                case 7:
-                    int x, y;
-                    getyx(tty_window, y, x);
-                    if(x>0)
-                    {
-                        wmove(tty_window, y, x-1);
-                        wprintw(tty_window, " ");
-                        wmove(tty_window, y, x-1);
-                        input_buffer[input_pos] = 0;
-                        input_buffer[input_pos-1] = 0;
-                        input_pos--;
-                    }
-                    break;
-                default:
-                    stream_screen_content("", output_buffer);
-                    wprintw(tty_window, "%c", input_buffer[input_pos]);
-                    input_pos++;
-                    break;
-
-            }
-        }
-        wprintw(tty_window, "%s", output_buffer);
-        Refresh_Window();
+    bzero(output_buffer, BUFFER_SIZE);
+    read(screen_stdin[PIPE_READ], input_pipe_buffer, 1);
+    input_buffer[input_pos] = input_pipe_buffer[0];
+    if(input_buffer[input_pos] == ERR){
+        input_buffer[input_pos] = 0;
+        stream_screen_content("", output_buffer);
     }
+    else{
+        switch(input_buffer[input_pos]){
+            case '\n':
+                stream_screen_content(input_buffer, output_buffer);
+                wprintw(tty_window, "%c", input_buffer[input_pos]);
+                bzero(input_buffer, BUFFER_SIZE);
+                input_pos=0;
+                break;
+            case KEY_BACKSPACE:
+                int x, y;
+                getyx(tty_window, y, x);
+                if(x>0)
+                {
+                    wmove(tty_window, y, x-1);
+                    wprintw(tty_window, " ");
+                    wmove(tty_window, y, x-1);
+                    input_buffer[input_pos] = 0;
+                    input_buffer[input_pos-1] = 0;
+                    input_pos--;
+                }
+                break;
+            default:
+                stream_screen_content("", output_buffer);
+                wprintw(tty_window, "%c", input_buffer[input_pos]);
+                input_pos++;
+                break;
+
+        }
+    }
+    wprintw(tty_window, "%s", output_buffer);
+    Refresh_Window();
 }
 
 void Child::Refresh_Window() {
@@ -158,6 +185,14 @@ void Child::Redraw_Window() {
     tty_window = newwin(cwd.height-2, cwd.width-2, cwd.y+1, cwd.x+1);
     scrollok(tty_window, true);
     Refresh_Window();
+}
+
+void Child::Set_Pos_Size(WINDOW_DESC w_desc) {
+    cwd = w_desc;
+}
+
+int Child::child_in() {
+    return screen_stdin[PIPE_WRITE];
 }
 
 

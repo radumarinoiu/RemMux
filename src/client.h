@@ -12,8 +12,8 @@ private:
     sockaddr_in server;
     WINDOW *parent_window, *child_window, *tty_window;
     int screen_stdin[2];
-    int screen_stdout[2];
     int input_pos;
+    char input_pipe_buffer[2];
     char input_buffer[BUFFER_SIZE];
     char output_buffer[BUFFER_SIZE];
 
@@ -21,11 +21,13 @@ private:
 
     bool connect_to_server();
 
+public:
+    int child_in();
+
     void child_loop();
 
     void resize_event();
 
-public:
     bool check_heartbeat();
 
     bool stream_screen_content(
@@ -41,11 +43,15 @@ public:
     void Refresh_Window();
 
     void Redraw_Window();
+
+    void Set_Pos_Size(WINDOW_DESC w_desc);
 };
 
 class Client{
 private:
     std::list<Child> children;
+
+    void resize_event();
 
     void main_loop();
 public:
