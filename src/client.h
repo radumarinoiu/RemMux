@@ -10,53 +10,46 @@ private:
 
     int sd;
     sockaddr_in server;
-    WINDOW *parent_window, *child_window, *tty_window;
+    WINDOW *child_window, *tty_window;
     int screen_stdin[2];
-    int input_pos;
-    char input_pipe_buffer[2];
+    int input_pos = 0;
+    char piped_char;
     char input_buffer[BUFFER_SIZE];
     char output_buffer[BUFFER_SIZE];
 
-    bool create_console();
-
-    bool connect_to_server();
-
-public:
-    int child_in();
-
-    void child_loop();
-
-    void resize_event();
-
-    bool check_heartbeat();
-
+//    bool connect_to_server();
     bool stream_screen_content(
             const char *send_buf,
             char *recv_buf);
 
-    Child(
-            char* address,
-            int port,
-            WINDOW *parent,
-            WINDOW_DESC w_desc);
-
+public:
+    int Get_Child_Stdin();
+    void Loop();
+    void Resize_Event();
+//    bool check_heartbeat();
+    Child(int socket_descriptor);
     void Refresh_Window();
-
     void Redraw_Window();
-
     void Set_Pos_Size(WINDOW_DESC w_desc);
 };
 
 class Client{
 private:
-    std::list<Child> children;
+    int sd;
+    sockaddr_in server;
+    std::vector<Child> children;
+    char input_char;
+    int command_mode = 0;
+    int focused_child = 0;
 
     void resize_event();
+    void read_command();
 
-    void main_loop();
 public:
-    bool Start_Client();
-    int Join_Client_Thread();
+    Client(char* address,
+            int port);
+    void Loop();
+    void Create_Child();
 };
 
 #endif //REMMUX_CLIENT_H

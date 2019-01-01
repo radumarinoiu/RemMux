@@ -7,14 +7,17 @@ private:
     int sd;
     int shell_stdin[2];
     int shell_stdout[2];
+    bool run_loop = true;
 
-    void child_loop();
+    void Loop();
     void start_shell();
     void process_stream();
     void process_heartbeat();
+    void process_shutdown();
 
 public:
     Child(int socket_descriptor);
+    void Shutdown();
 };
 
 class Server {
@@ -27,7 +30,6 @@ private:
 public:
     Server(int port);
     bool Start_Listening();
-    void Stop_Listening();
 };
 
 #endif //REMMUX_SERVER_H

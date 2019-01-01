@@ -16,9 +16,10 @@ Child::Child(int socket_descriptor) {
         perror("Failed to create pipe");
         return;
     }
-    child_loop();
+    Loop();
     start_shell();
 }
+
 void Child::start_shell() {
     int pid = fork();
     if(pid == 0)
@@ -62,15 +63,12 @@ void Child::start_shell() {
     */
 }
 
-
-
-void Child::child_loop() {
+void Child::Loop() {
     int pid = fork();
     if(pid == 0){
         int8_t recv_cmd;
-        bool run = true;
 
-        while(run){
+        while(run_loop){
             read(sd, &recv_cmd, 1);
             switch(recv_cmd){
                 case PROTOCOL_HEARTBEAT:
@@ -80,7 +78,7 @@ void Child::child_loop() {
                     process_stream();
                     break;
                 case PROTOCOL_INITIATE_SHUTDOWN:
-                    run = false;
+                    process_shutdown();
                     break;
                 default:
                     perror("Received invalid command");
@@ -88,6 +86,14 @@ void Child::child_loop() {
             }
         }
     }
+}
+
+void Child::process_shutdown() {
+    run_loop = false;
+}
+
+void Child::Shutdown() {
+    process_shutdown();
 }
 
 void Child::process_heartbeat() {
@@ -143,28 +149,42 @@ Server::Server(int port) {
 }
 
 bool Server::Start_Listening() {
+    bool run = true;
+    int8_t recv_cmd;
+    int child_sd;
     if (listen (sd, 5) == -1)
     {
         perror("Failed to start listening!");
         return false;
     }
-    int child_sd;
-    while(1){
+    while(run){
         child_sd = accept (sd, (sockaddr *) &client, &client_size);
+        perror("New connection");
         if(child_sd < 0){
             perror("An error occurred accepting a connection!");
             continue;
         }
-        Child child(child_sd);
-        children.push_back(child);
+        read(child_sd, &recv_cmd, 1);
+        switch (recv_cmd){
+            case PROTOCOL_CREATE_SESSION:{
+                perror("New child");
+                Child child(child_sd);
+                children.push_back(child);
+                break;
+            }
+            case PROTOCOL_INITIATE_SHUTDOWN:{
+                run = false;
+                for(Child &child: children)
+                    child.Shutdown();
+                break;
+            }
+            default:{
+                break;
+            }
+        }
     }
     return true;
 }
-
-void Server::Stop_Listening() {
-
-}
-
 
 
 int main(){
