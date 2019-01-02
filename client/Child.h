@@ -10,6 +10,7 @@ class Child{
 private:
     bool run_loop = true;
     WINDOW_DESC cwd;//tty is x+1, y+1, width-2, height-3
+//    FILE *debug;
 
     int sd;
     sockaddr_in server;
@@ -27,7 +28,7 @@ private:
 
 public:
     int Get_Child_Stdin();
-    void Loop();
+    void loop();
     void Resize_Event();
 //    bool check_heartbeat();
     Child(int socket_descriptor);

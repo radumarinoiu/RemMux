@@ -26,7 +26,6 @@ int main() {
     timeout(250);
     sleep(1);
     Client main_cl(ip_address, 8912);
-    main_cl.Create_Child();
     while(1){
         main_cl.Loop();
     }

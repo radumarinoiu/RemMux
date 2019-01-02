@@ -51,7 +51,7 @@ void Child::Set_Pos_Size(WINDOW_DESC w_desc) {
 
 bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO: Implement reading/writing from/to screen pipes.
     int8_t prot = PROTOCOL_STREAM;
-    int8_t send_size = strlen(send_buf), recv_size;
+    int send_size = strlen(send_buf), recv_size;
 
     if(write(sd, &prot, 1) <= 0)
         return false;
@@ -63,18 +63,18 @@ bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO:
     if(PROTOCOL_STREAM != prot)
         return false;
 
-    write(sd, &send_size, 1);
+    write(sd, &send_size, sizeof(send_size));
 
     if(send_size > 0)
         write(sd, send_buf, send_size);
 
-    read(sd, &recv_size, 1);
+    read(sd, &recv_size, sizeof(recv_size));
     if(recv_size > 0){
         read(sd, recv_buf, recv_size);
     }
 }
 
-void Child::Loop() {
+void Child::loop() {
     piped_char = 0;
     read(screen_stdin[PIPE_READ], &piped_char, 1);
     input_buffer[input_pos] = piped_char;

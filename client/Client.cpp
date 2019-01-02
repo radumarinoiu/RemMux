@@ -41,7 +41,7 @@ void Client::Loop() {
             break;
     }
     for(Child &child: children)
-        child.Loop();
+        child.loop();
 }
 
 void Client::resize_event() {
