@@ -1,5 +1,9 @@
-#ifndef REMMUX_SERVER_H
-#define REMMUX_SERVER_H
+//
+// Created by radu on 02.01.2019.
+//
+
+#ifndef REMMUX_CHILD_H
+#define REMMUX_CHILD_H
 
 
 class Child {
@@ -20,16 +24,5 @@ public:
     void Shutdown();
 };
 
-class Server {
-private:
-    int sd;
-    sockaddr_in listener, client;
-    socklen_t client_size = sizeof(client);
-    std::list<Child> children;
 
-public:
-    Server(int port);
-    bool Start_Listening();
-};
-
-#endif //REMMUX_SERVER_H
+#endif //REMMUX_CHILD_H

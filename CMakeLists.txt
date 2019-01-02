@@ -3,8 +3,8 @@ project(RemMux)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(RemMux_Client src/client.cpp src/client.h src/constants.h)
-add_executable(RemMux_Server src/server.cpp src/server.h src/constants.h)
+add_executable(RemMux_Client client/main.cpp client/Client.h client/Client.cpp client/Child.h client/Child.cpp)
+add_executable(RemMux_Server server/main.cpp server/Server.h server/Server.cpp server/Child.h server/Child.cpp server/Shell.h server/Shell.cpp)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})

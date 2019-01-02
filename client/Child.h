@@ -1,7 +1,10 @@
-#ifndef REMMUX_CLIENT_H
-#define REMMUX_CLIENT_H
+//
+// Created by radu on 02.01.2019.
+//
 
-#include "constants.h"
+#ifndef REMMUX_CHILD_H
+#define REMMUX_CHILD_H
+
 
 class Child{
 private:
@@ -33,23 +36,5 @@ public:
     void Set_Pos_Size(WINDOW_DESC w_desc);
 };
 
-class Client{
-private:
-    int sd;
-    sockaddr_in server;
-    std::vector<Child> children;
-    char input_char;
-    int command_mode = 0;
-    int focused_child = 0;
 
-    void resize_event();
-    void read_command();
-
-public:
-    Client(char* address,
-            int port);
-    void Loop();
-    void Create_Child();
-};
-
-#endif //REMMUX_CLIENT_H
+#endif //REMMUX_CHILD_H

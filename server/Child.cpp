@@ -6,8 +6,9 @@
 #include <cstring>
 #include <fcntl.h>
 
-#include "server.h"
-#include "constants.h"
+#include "../common/constants.h"
+#include "Child.h"
+#include "Shell.h"
 
 Child::Child(int socket_descriptor) {
     sd = socket_descriptor;
@@ -127,67 +128,4 @@ void Child::process_stream() {
         write(sd, resp_buffer, resp_size);
     }
     write(shell_stdin[PIPE_WRITE], recv_buffer, strlen(recv_buffer));
-}
-
-
-Server::Server(int port) {
-    bzero (&listener, sizeof (listener));
-    bzero (&client, sizeof (client));
-    listener.sin_family = AF_INET;
-    listener.sin_addr.s_addr = htonl (INADDR_ANY);
-    listener.sin_port = htons (port);
-    if((sd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-    {
-        perror("Failed to create socket!");
-        return;
-    }
-    if (bind (sd, (struct sockaddr *) &listener, sizeof (sockaddr)) == -1)
-    {
-        perror("Failed to bind to port!");
-        return;
-    }
-}
-
-bool Server::Start_Listening() {
-    bool run = true;
-    int8_t recv_cmd;
-    int child_sd;
-    if (listen (sd, 5) == -1)
-    {
-        perror("Failed to start listening!");
-        return false;
-    }
-    while(run){
-        child_sd = accept (sd, (sockaddr *) &client, &client_size);
-        perror("New connection");
-        if(child_sd < 0){
-            perror("An error occurred accepting a connection!");
-            continue;
-        }
-        read(child_sd, &recv_cmd, 1);
-        switch (recv_cmd){
-            case PROTOCOL_CREATE_SESSION:{
-                perror("New child");
-                Child child(child_sd);
-                children.push_back(child);
-                break;
-            }
-            case PROTOCOL_INITIATE_SHUTDOWN:{
-                run = false;
-                for(Child &child: children)
-                    child.Shutdown();
-                break;
-            }
-            default:{
-                break;
-            }
-        }
-    }
-    return true;
-}
-
-
-int main(){
-    Server server(8912);
-    server.Start_Listening();
 }
