@@ -110,6 +110,9 @@ void Client::read_command() {
     }while(input != '\n');
     char *cmd_part;
     cmd_part = strtok(cmd, " ");
+    move(cursor_y, 0);
+    clrtoeol();
+    move(cursor_y, 0);
     if(strcmp(cmd_part, "create") == 0){
         Create_Child();
     }
@@ -121,6 +124,4 @@ void Client::read_command() {
         focused_child = atoi(cmd_part);
         mvprintw(cursor_y, cursor_x, "Selected %d", focused_child);
     }
-    move(cursor_y, 0);
-    clrtoeol();
 }

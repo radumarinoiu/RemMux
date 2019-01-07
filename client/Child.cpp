@@ -104,10 +104,14 @@ void Child::loop() {
             }
             break;
         }
-        default:{
+        case 32 ... 126:{ //WARNING: This is a gcc extension
             stream_screen_content("", output_buffer);
             wprintw(tty_window, "%c", input_buffer[input_pos]);
             input_pos++;
+            break;
+        }
+        default:{
+            stream_screen_content("", output_buffer);
             break;
         }
 

@@ -32,7 +32,7 @@ int Shell::Get_Stdout() {
     return shell_stdout[PIPE_READ];
 }
 
-void Shell::loop() {
+void Shell::loop() { //TODO: Handle quotes in commands
     char in;
     do{
         read(shell_stdin[PIPE_READ], &in, 1);
