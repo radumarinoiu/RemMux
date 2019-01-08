@@ -1,10 +1,12 @@
 #include <unistd.h>
-#include <netinet/in.h>
 #include <list>
 #include <cstdio>
 #include <strings.h>
 #include <cstring>
 #include <fcntl.h>
+#include <signal.h>
+#include <netinet/in.h>
+#include <sys/wait.h>
 
 #include "../common/constants.h"
 #include "Child.h"
@@ -13,6 +15,11 @@
 Child::Child(int socket_descriptor) {
     sd = socket_descriptor;
     loop();
+}
+
+void Child::deal_with_the_loss_of_a_child() {
+    int child_status;
+    wait(&child_status);
 }
 
 void Child::loop() {
@@ -54,7 +61,7 @@ void Child::process_heartbeat() {
     write(sd, &prot, 1);
 }
 
-void Child::process_stream() {
+void Child::process_stream() {//TODO: Implement keepalive and connection timeout on server
     int8_t prot = PROTOCOL_STREAM;
     write(sd, &prot, 1);
     int resp_size, recv_size = 0;

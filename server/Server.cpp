@@ -55,8 +55,6 @@ bool Server::Start_Listening() {
             }
             case PROTOCOL_INITIATE_SHUTDOWN:{
                 run = false;
-                for(Child &child: children)
-                    child.Shutdown();
                 break;
             }
             default:{

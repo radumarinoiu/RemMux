@@ -17,6 +17,8 @@ private:
     Shell sh;
     FILE *debug;
 
+    void deal_with_the_loss_of_a_child();
+
     void loop();
     void process_stream();
     void process_heartbeat();
