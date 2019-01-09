@@ -26,8 +26,9 @@ Client::Client(char *address, int port) {
 }
 
 void Client::Loop() {
-    input_char = getch();
-    switch(input_char){
+    input_int = getch();
+    input_char = (char)input_int;
+    switch(input_int){
         case ERR:
             break;
         case KEY_RESIZE:
@@ -36,8 +37,10 @@ void Client::Loop() {
         case 1:
             read_command();
             break;
-        default:
+        case 2 ... 255:
             write(children[focused_child].Get_Child_Stdin(), &input_char, 1);
+            break;
+        default:
             break;
     }
     for(Child &child: children)

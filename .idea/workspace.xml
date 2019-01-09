@@ -15,10 +15,8 @@
   <component name="ChangeListManager">
     <list default="true" id="b77b7685-7448-4c0b-a7ca-37aca4aecc2e" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/client/Child.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/Child.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Client.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/client/Client.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/client/Client.h" beforeDir="false" afterPath="$PROJECT_DIR$/client/Client.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/constants.h" beforeDir="false" afterPath="$PROJECT_DIR$/common/constants.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -32,7 +30,29 @@
     <favorites_list name="RemMux" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/client/Child.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="436">
+              <caret line="96" column="13" lean-forward="true" selection-start-line="96" selection-start-column="13" selection-end-line="96" selection-end-column="13" />
+              <folding>
+                <element signature="e#0#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/client/Client.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="285">
+              <caret line="36" column="15" lean-forward="true" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
@@ -42,6 +62,7 @@
       <find>for(Child</find>
       <find>strtok</find>
       <find>fork</find>
+      <find>input_char</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -73,9 +94,9 @@
         <option value="$PROJECT_DIR$/server/Child.cpp" />
         <option value="$PROJECT_DIR$/client/main.cpp" />
         <option value="$PROJECT_DIR$/common/constants.h" />
+        <option value="$PROJECT_DIR$/client/Child.cpp" />
         <option value="$PROJECT_DIR$/client/Client.h" />
         <option value="$PROJECT_DIR$/client/Client.cpp" />
-        <option value="$PROJECT_DIR$/client/Child.cpp" />
       </list>
     </option>
   </component>
@@ -104,11 +125,6 @@
               <item name="RemMux" type="b2602c69:ProjectViewProjectNode" />
               <item name="RemMux" type="462c0819:PsiDirectoryNode" />
               <item name="client" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="RemMux" type="b2602c69:ProjectViewProjectNode" />
-              <item name="RemMux" type="462c0819:PsiDirectoryNode" />
-              <item name="common" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="RemMux" type="b2602c69:ProjectViewProjectNode" />
@@ -219,16 +235,18 @@
       <workItem from="1546965821651" duration="25000" />
       <workItem from="1546965892752" duration="2672000" />
       <workItem from="1547042736361" duration="1327000" />
+      <workItem from="1547044171249" duration="350000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="109959000" />
+    <option name="totallyTimeSpent" value="110309000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="27" width="1920" height="1124" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49945828" visible="true" weight="0.078975454" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49945828" visible="true" weight="0.08004269" />
       <window_info id="Structure" order="1" sideWeight="0.5005417" side_tool="true" weight="0.07677009" />
       <window_info id="Favorites" order="2" sideWeight="0.5005417" side_tool="true" weight="0.07677009" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -243,7 +261,7 @@
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="10" weight="0.329718" />
       <window_info anchor="bottom" id="CMake" order="11" weight="0.25252524" />
-      <window_info anchor="bottom" id="Messages" order="12" weight="0.16295546" />
+      <window_info active="true" anchor="bottom" id="Messages" order="12" visible="true" weight="0.16295546" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -397,13 +415,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/client/Client.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="15" column="7" selection-start-line="15" selection-start-column="7" selection-end-line="15" selection-end-column="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/common/constants.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="135">
@@ -421,27 +432,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/Child.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="24" column="20" lean-forward="true" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/client/Client.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="18" selection-start-line="16" selection-start-column="18" selection-end-line="16" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/client/Client.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="265">
-          <caret line="42" column="7" selection-start-line="42" selection-start-column="7" selection-end-line="42" selection-end-column="7" />
+        <state relative-caret-position="285">
+          <caret line="36" column="15" lean-forward="true" selection-start-line="36" selection-start-column="15" selection-end-line="36" selection-end-column="15" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/client/Child.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="706">
-          <caret line="126" lean-forward="true" selection-start-line="126" selection-end-line="126" />
+        <state relative-caret-position="436">
+          <caret line="96" column="13" lean-forward="true" selection-start-line="96" selection-start-column="13" selection-end-line="96" selection-end-column="13" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/Child.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="24" column="20" lean-forward="true" selection-start-line="24" selection-start-column="20" selection-end-line="24" selection-end-column="20" />
         </state>
       </provider>
     </entry>
