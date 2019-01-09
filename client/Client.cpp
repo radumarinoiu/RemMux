@@ -30,7 +30,7 @@ void Client::Loop() {
     switch(input_char){
         case ERR:
             break;
-        case KEY_RESIZE: //TODO: Replace this value with correct one.
+        case KEY_RESIZE:
             resize_event();
             break;
         case 1:
@@ -45,6 +45,8 @@ void Client::Loop() {
 }
 
 void Client::resize_event() {
+    int CONSOLE_H, CONSOLE_W;
+    getmaxyx(stdscr, CONSOLE_H, CONSOLE_W);
     int window_count = children.size();
     int rows = 0, cols = 0;
     int i = 0, j = 0;
@@ -63,9 +65,9 @@ void Client::resize_event() {
         }
         if(i >= rows)
             break;
-        w_desc.height = CONSOLE_H / rows;
+        w_desc.height = (CONSOLE_H - 1) / rows;
         w_desc.width = CONSOLE_W / cols;
-        w_desc.y = CONSOLE_H / rows * i;
+        w_desc.y = (CONSOLE_H - 1) / rows * i;
         w_desc.x = CONSOLE_W / cols * j;
         child.Set_Pos_Size(w_desc);
         child.Resize_Event();
@@ -87,7 +89,9 @@ void Client::Create_Child() {
 
 void Client::read_command() {
     int cursor_y, cursor_x;
-    cursor_y = REAL_CONSOLE_H; cursor_x = 0;
+    int CONSOLE_H, CONSOLE_W;
+    getmaxyx(stdscr, CONSOLE_H, CONSOLE_W);
+    cursor_y = CONSOLE_H - 1; cursor_x = 0;
     mvprintw(cursor_y, cursor_x, ":"); ++cursor_x;
     move(cursor_y, cursor_x);
     clrtoeol();
@@ -101,7 +105,7 @@ void Client::read_command() {
             cmd_len++;
             mvprintw(cursor_y, cursor_x, "%c", input);
             cursor_x++;
-            if (cursor_x >= REAL_CONSOLE_W) {
+            if (cursor_x >= CONSOLE_W) {
                 cursor_x = 1;
                 move(cursor_y, cursor_x);
                 clrtoeol();

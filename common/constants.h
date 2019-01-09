@@ -8,10 +8,6 @@
 #define PIPE_READ 0
 #define PIPE_WRITE 1
 
-#define REAL_CONSOLE_H 59
-#define REAL_CONSOLE_W 220
-#define CONSOLE_H 59
-#define CONSOLE_W 220
 #define MAX_WINDOWS 25
 
 #define BUFFER_SIZE 10240
