@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/wait.h>
+#include <poll.h>
 
 #include "../common/constants.h"
 #include "Child.h"
@@ -19,19 +20,40 @@ Child::Child(int socket_descriptor) {
 void Child::loop() {
     pid = fork();
     if(pid == 0){
+        fd_set readfds;		/* multimea descriptorilor de citire */
+        fd_set actfds;		/* multimea descriptorilor activi */
+        struct timeval tv;		/* structura de timp pentru select() */
+        int sd, client;		/* descriptori de socket */
+        int optval=1; 			/* optiune folosita pentru setsockopt()*/
+        int fd;			/* descriptor folosit pentru
+				   parcurgerea listelor de descriptori */
+        int nfds;			/* numarul maxim de descriptori */
+        time_t time_now;
+        time_now = time(nullptr);
+        last_client_message_time = time_now;
         int8_t recv_cmd;
         debug = fopen("debug_server.log", "w");
 
         while(run_loop){
+            time_now = time(nullptr);
+            printf("%d\n", time_now - last_client_message_time);
+            fflush(stdout);
+            if(time_now - last_client_message_time > 5){
+                printf("Client timed out, shutting down.");
+                fflush(stdout);
+                process_shutdown();
+            }
+            select()
             read(sd, &recv_cmd, sizeof(recv_cmd));
             switch(recv_cmd){
-                case PROTOCOL_INITIATE_SHUTDOWN:
+                case PROTOCOL_INITIATE_SHUTDOWN: //Not used
                     process_shutdown();
                     break;
-                case PROTOCOL_HEARTBEAT:
+                case PROTOCOL_HEARTBEAT: //Not used
                     process_heartbeat();
                     break;
-                case PROTOCOL_STREAM:
+                case PROTOCOL_STREAM: //TODO: Implement connection timeout on server
+                    last_client_message_time = time_now;
                     process_stream();
                     break;
                 default:
@@ -42,11 +64,14 @@ void Child::loop() {
 }
 
 void Child::process_shutdown() {
+    fprintf(debug, "Client timed out, shutting down.");
     run_loop = false;
     int status;
     if(pid){
         kill(pid, SIGINT);
         waitpid(pid, &status, 0);
+    } else{
+        _exit(0);
     }
 }
 
@@ -59,7 +84,7 @@ void Child::process_heartbeat() {
     write(sd, &prot, sizeof(prot));
 }
 
-void Child::process_stream() {//TODO: Implement keepalive and connection timeout on server
+void Child::process_stream() {
     int8_t prot = PROTOCOL_STREAM;
     write(sd, &prot, sizeof(prot));
     int resp_size, recv_size = 0;

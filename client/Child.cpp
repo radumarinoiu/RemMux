@@ -24,7 +24,7 @@ Child::Child(int socket_descriptor) {
     pipe(screen_stdin);
     bzero(input_buffer, BUFFER_SIZE);
     bzero(output_buffer, BUFFER_SIZE);
-    fcntl( screen_stdin[PIPE_READ], F_SETFL, fcntl(screen_stdin[PIPE_READ], F_GETFL) | O_NONBLOCK);
+    fcntl(screen_stdin[PIPE_READ], F_SETFL, fcntl(screen_stdin[PIPE_READ], F_GETFL) | O_NONBLOCK);
 }
 
 void Child::Resize_Event() {
@@ -50,7 +50,7 @@ void Child::Set_Pos_Size(WINDOW_DESC w_desc) {
     cwd = w_desc;
 }
 
-bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO: Implement reading/writing from/to screen pipes.
+bool Child::stream_screen_content(const char *send_buf, char *recv_buf){
     int8_t prot = PROTOCOL_STREAM;
     int send_size = strlen(send_buf), recv_size;
 

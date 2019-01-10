@@ -13,12 +13,13 @@
 
 void child_death_handler(int sig_nr){
     int retval;
-    if(sig_nr == SIGCHLD)
-        wait(&retval);
+    wait(&retval);
 }
 
 int main(){
-    //signal(SIGCHLD, child_death_handler);
+    signal(SIGCHLD, child_death_handler);
     Server server(8912);
     server.Start_Listening();
+    sleep(10);
+    getchar();
 }
