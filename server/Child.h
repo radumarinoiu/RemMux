@@ -10,14 +10,12 @@
 
 class Child {
 private:
-    int sd;
+    int sd, pid;
     int shell_stdin[2];
     int shell_stdout[2];
     bool run_loop = true;
     Shell sh;
     FILE *debug;
-
-    void deal_with_the_loss_of_a_child();
 
     void loop();
     void process_stream();

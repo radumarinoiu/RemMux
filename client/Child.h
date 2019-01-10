@@ -5,7 +5,6 @@
 #ifndef REMMUX_CHILD_H
 #define REMMUX_CHILD_H
 
-
 class Child{
 private:
     bool run_loop = true;
@@ -17,7 +16,7 @@ private:
     WINDOW *child_window, *tty_window;
     int screen_stdin[2];
     int input_pos = 0;
-    char piped_char;
+    int piped_char;
     char input_buffer[BUFFER_SIZE];
     char output_buffer[BUFFER_SIZE];
 
@@ -28,6 +27,7 @@ private:
 
 public:
     int Get_Child_Stdin();
+    void Focus_Window();
     void loop();
     void Resize_Event();
 //    bool check_heartbeat();

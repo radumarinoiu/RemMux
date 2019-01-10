@@ -13,8 +13,7 @@ private:
     int sd;
     sockaddr_in server;
     std::vector<Child> children;
-    char input_char;
-    int input_int;
+    int input;
     int command_mode = 0;
     int focused_child = 0;
 

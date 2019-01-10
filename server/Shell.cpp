@@ -35,7 +35,7 @@ int Shell::Get_Stdout() {
 void Shell::loop() { //TODO: Handle quotes in commands
     char in;
     do{
-        read(shell_stdin[PIPE_READ], &in, 1);
+        read(shell_stdin[PIPE_READ], &in, sizeof(in));
         if(in == '\n'){
             fprintf(debug, "Read \\n from shell_stdin. Executing...\n");
             fflush(debug);

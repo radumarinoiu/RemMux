@@ -26,9 +26,8 @@ Client::Client(char *address, int port) {
 }
 
 void Client::Loop() {
-    input_int = getch();
-    input_char = (char)input_int;
-    switch(input_int){
+    input = getch();
+    switch(input){
         case ERR:
             break;
         case KEY_RESIZE:
@@ -37,14 +36,21 @@ void Client::Loop() {
         case 1:
             read_command();
             break;
-        case 2 ... 255:
-            write(children[focused_child].Get_Child_Stdin(), &input_char, 1);
+        case 32 ... 126:
+            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
+            break;
+        case '\n':
+            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
+            break;
+        case KEY_BACKSPACE:
+            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
             break;
         default:
             break;
     }
     for(Child &child: children)
         child.loop();
+    children[focused_child].Focus_Window();
 }
 
 void Client::resize_event() {
@@ -94,25 +100,49 @@ void Client::read_command() {
     int cursor_y, cursor_x;
     int CONSOLE_H, CONSOLE_W;
     getmaxyx(stdscr, CONSOLE_H, CONSOLE_W);
-    cursor_y = CONSOLE_H - 1; cursor_x = 0;
-    mvprintw(cursor_y, cursor_x, ":"); ++cursor_x;
-    move(cursor_y, cursor_x);
+    mvprintw(CONSOLE_H-1, 0, ":");
+    move(CONSOLE_H-1, 1);
     clrtoeol();
-    char input;
+    int input;
     char cmd[BUFFER_SIZE];
+    bzero(cmd, BUFFER_SIZE);
     int cmd_len = 0;
     do{
         input = getch();
-        if(input != ERR && input != '\n') {
-            cmd[cmd_len] = input;
-            cmd_len++;
-            mvprintw(cursor_y, cursor_x, "%c", input);
-            cursor_x++;
-            if (cursor_x >= CONSOLE_W) {
-                cursor_x = 1;
-                move(cursor_y, cursor_x);
-                clrtoeol();
+        switch(input){
+            case ERR:{
+                break;
             }
+            case '\n':{
+                break;
+            }
+            case 32 ... 126:{
+                cmd[cmd_len] = input;
+                cmd_len++;
+                printw("%c", input);
+                getyx(stdscr, cursor_y, cursor_x);
+                if (cursor_x >= CONSOLE_W) {
+                    move(cursor_y, 1);
+                    clrtoeol();
+                    move(cursor_y, 1);
+                }
+                break;
+            }
+            case KEY_BACKSPACE:{
+                getyx(stdscr, cursor_y, cursor_x);
+                if(cursor_x>1)
+                {
+                    move(cursor_y, cursor_x-1);
+                    printw(" ");
+                    move(cursor_y, cursor_x-1);
+                    cmd[cmd_len] = 0;
+                    cmd[cmd_len-1] = 0;
+                    cmd_len--;
+                }
+                break;
+            }
+            default:
+                break;
         }
     }while(input != '\n');
     char *cmd_part;
@@ -127,8 +157,15 @@ void Client::read_command() {
 
     }
     else if(strcmp(cmd_part, "select") == 0){
+        int new_child_focus;
         cmd_part = strtok(NULL, " ");
-        focused_child = atoi(cmd_part);
-        mvprintw(cursor_y, cursor_x, "Selected %d", focused_child);
+        new_child_focus = atoi(cmd_part);
+        if(new_child_focus < children.size()){
+            focused_child = new_child_focus;
+            mvprintw(cursor_y, cursor_x, "Selected %d", focused_child);
+            children[focused_child].Focus_Window();
+        }
+        else
+            mvprintw(cursor_y, cursor_x, "Child %d does not exist!", new_child_focus);
     }
 }

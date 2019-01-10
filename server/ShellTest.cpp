@@ -22,11 +22,11 @@ int main(){
                 break;
             }
             default:{
-                write(sh_stdin, &in, 1);
+                write(sh_stdin, &in, sizeof(in));
             }
         }
         bzero(out, BUFFER_SIZE);
-        read(sh.Get_Stdout(), out, BUFFER_SIZE);
+        read(sh.Get_Stdout(), out, BUFFER_SIZE*sizeof(out[0]));
         printw("%s", out);
     }
 }

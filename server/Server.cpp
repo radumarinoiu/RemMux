@@ -45,7 +45,7 @@ bool Server::Start_Listening() {
             perror("An error occurred accepting a connection!");
             continue;
         }
-        read(child_sd, &recv_cmd, 1);
+        read(child_sd, &recv_cmd, sizeof(recv_cmd));
         switch (recv_cmd){
             case PROTOCOL_CREATE_SESSION:{
                 perror("New child");
@@ -54,6 +54,9 @@ bool Server::Start_Listening() {
                 break;
             }
             case PROTOCOL_INITIATE_SHUTDOWN:{
+                for(auto child: children){
+                    child.Shutdown();
+                }
                 run = false;
                 break;
             }

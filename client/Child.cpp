@@ -14,12 +14,13 @@
 #include <fcntl.h>
 
 #include "../common/constants.h"
+#include "../common/utils.h"
 #include "Child.h"
 
 Child::Child(int socket_descriptor) {
     int8_t send_cmd = PROTOCOL_CREATE_SESSION;
     sd = socket_descriptor;
-    write(sd, &send_cmd, 1);
+    write(sd, &send_cmd, sizeof(send_cmd));
     pipe(screen_stdin);
     bzero(input_buffer, BUFFER_SIZE);
     bzero(output_buffer, BUFFER_SIZE);
@@ -53,11 +54,11 @@ bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO:
     int8_t prot = PROTOCOL_STREAM;
     int send_size = strlen(send_buf), recv_size;
 
-    if(write(sd, &prot, 1) <= 0)
+    if(write(sd, &prot, sizeof(prot)) <= 0)
         return false;
     prot = -1;
 
-    if(read(sd, &prot, 1) < 0)
+    if(read(sd, &prot, sizeof(prot)) < 0)
         return false;
 
     if(PROTOCOL_STREAM != prot)
@@ -70,15 +71,15 @@ bool Child::stream_screen_content(const char *send_buf, char *recv_buf){ //TODO:
 
     read(sd, &recv_size, sizeof(recv_size));
     if(recv_size > 0){
-        read(sd, recv_buf, recv_size);
+        read(sd, recv_buf, recv_size*sizeof(recv_buf[0]));
     }
 }
 
 void Child::loop() {
     piped_char = 0;
-    read(screen_stdin[PIPE_READ], &piped_char, 1);
+    read(screen_stdin[PIPE_READ], &piped_char, sizeof(piped_char));
     input_buffer[input_pos] = piped_char;
-    switch(input_buffer[input_pos]){
+    switch(piped_char){
         case 0:{
             stream_screen_content("", output_buffer);
             break;
@@ -123,4 +124,10 @@ void Child::loop() {
 
 int Child::Get_Child_Stdin() {
     return screen_stdin[PIPE_WRITE];
+}
+
+void Child::Focus_Window() {
+    int x, y;
+    getyx(tty_window, y, x);
+    move(cwd.y + y + 1, cwd.x + x + 1);
 }
