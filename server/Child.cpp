@@ -20,14 +20,10 @@ Child::Child(int socket_descriptor) {
 void Child::loop() {
     pid = fork();
     if(pid == 0){
-        fd_set readfds;		/* multimea descriptorilor de citire */
-        fd_set actfds;		/* multimea descriptorilor activi */
-        struct timeval tv;		/* structura de timp pentru select() */
-        int sd, client;		/* descriptori de socket */
-        int optval=1; 			/* optiune folosita pentru setsockopt()*/
-        int fd;			/* descriptor folosit pentru
-				   parcurgerea listelor de descriptori */
-        int nfds;			/* numarul maxim de descriptori */
+        struct pollfd fd;
+        int ret;
+        fd.fd = sd;
+        fd.events = POLLIN;
         time_t time_now;
         time_now = time(nullptr);
         last_client_message_time = time_now;
@@ -43,7 +39,9 @@ void Child::loop() {
                 fflush(stdout);
                 process_shutdown();
             }
-            select()
+            ret = poll(&fd, 1, 1000);
+            if (ret <= 0)
+                continue;
             read(sd, &recv_cmd, sizeof(recv_cmd));
             switch(recv_cmd){
                 case PROTOCOL_INITIATE_SHUTDOWN: //Not used
