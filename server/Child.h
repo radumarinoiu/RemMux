@@ -15,7 +15,6 @@ private:
     int shell_stdout[2];
     bool run_loop = true;
     Shell sh;
-    FILE *debug;
     time_t last_client_message_time;
 
     void loop();

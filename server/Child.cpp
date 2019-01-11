@@ -28,7 +28,6 @@ void Child::loop() {
         time_now = time(nullptr);
         last_client_message_time = time_now;
         int8_t recv_cmd;
-        debug = fopen("debug_server.log", "w");
 
         while(run_loop){
             time_now = time(nullptr);
@@ -61,7 +60,6 @@ void Child::loop() {
 }
 
 void Child::process_shutdown() {
-    fprintf(debug, "Client timed out, shutting down.");
     run_loop = false;
     int status;
     if(pid){
@@ -98,18 +96,12 @@ void Child::process_stream() {
         printf("\n");
     }
     read(sh.Get_Stdout(), resp_buf, BUFFER_SIZE*sizeof(resp_buf[0]));
-    fprintf(debug, "Read %s\n", resp_buf);
-    fflush(debug);
 
     //strcat(resp_buffer, recv_buffer);
     resp_size = strlen(resp_buf);
-    fprintf(debug, "Wrote %d bytes\n", resp_size);
-    fflush(debug);
     write(sd, &resp_size, sizeof(resp_size));
     if(resp_size > 0){
 
-        fprintf(debug, "%s\n", resp_buf);
-        fflush(debug);
         write(sd, resp_buf, resp_size);
     }
     write(sh.Get_Stdin(), recv_buf, strlen(recv_buf)*sizeof(recv_buf[0]));
