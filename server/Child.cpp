@@ -32,9 +32,8 @@ void Child::loop() {
 
         while(run_loop){
             time_now = time(nullptr);
-            printf("%d\n", time_now - last_client_message_time);
             fflush(stdout);
-            if(time_now - last_client_message_time > 5){
+            if(time_now - last_client_message_time > 15){
                 printf("Client timed out, shutting down.");
                 fflush(stdout);
                 process_shutdown();
