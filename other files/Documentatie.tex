@@ -1,0 +1,125 @@
+\documentclass[runningheads]{llncs}
+\usepackage{listings}
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+\begin{document}
+\title{Proiect RemMux}
+\author{Radu-Florin Marinoiu}
+\authorrunning{Radu-Florin Marinoiu - RemMux}
+\institute{Facultatea de Informatică, Universitatea „Alexandru Ioan Cuza”
+\email{radumarinoiu98@gmail.com}\\
+\url{http://students.info.uaic.ro/~radu.marinoiu}}
+\maketitle
+
+\newpage
+\section{Introducere}
+\subsection{Proiectul ales}
+Proiectul ales de mine este RemMux.\newline\newline
+Cerinta: Implementati un client/server(concurent) ce permite executia de comenzi la distanta - similar cu SecureSHell, insa fara cerinte de encriptie.\newline
+Clientul va rula intr-un terminal, si va putea deschide ferestre multiple, afisate vizual simultan - similar cu Tmux.\newline
+Sugestie: folositi bibliotecile curses/ncurses. 
+
+\subsection{Motivul alegerii}
+Am ales acest proiect deoarece mi s-a parut interesanta libraria ncurses si realizarea unei aplicatii cu ferestre intr-o consola.
+
+\subsection{Functionalitatea aplicatiei}
+Aplicatia client va rula intr-un terminal in care putem deschide mai multe ferestre, fiecare continand un shell.\newline
+La creerea unei ferestre, aceasta deschide o conexiune cu server-ul si face pipe la input prin socket-ul spre server.\newline
+Serverul isi creeaza cate un copil pentru fiecare client conectat caruia ii paseaza toate datele necesare comunicarii cu clientul.
+Acesta executa comenzile primite de la client intr-un shell propriu dupa care trimite output-ul comenzii inapoi la client.\newline
+Clientul afiseaza output-ul primit in terminalul deschis.
+
+\newpage
+\section{Tehnologii utilizate}
+Am folosit NCurses pentru a crea interfata in consola. Pentru backend am folosit socket-uri TCP, pipe-uri si subprocese (fork).
+
+\newpage
+\section{Arhitectura aplicatiei}
+\subsection{Serverul}
+Serverul odata pornit va asculta pe un anumit port, asteptand conexiuni de la clienti. In momentul in care un client se conecteaza la server, acesta creeaza un copil dedicat acelui client si apoi revine la a astepta conexiuni.
+\subsection{Shell-ul}
+Cand un client se conecteaza la server, acestia isi creeaza copii care continua comunicarea, iar copilul serverului creeaza un shell spre care redirecteaza tot input-ul de la client si tot output-ul spre client. Acest shell ia input-ul, il parseaza si apoi executa comenzile cand este posibil, ca apoi sa returneze output-ul acestora.
+\subsection{Clientul}
+Clientul isi creeaza un copil ce se conecteaza la server si pastreaza un socket tcp prin care sa comunice cu serverul. Copilul citeste tot ce primeste de la parinte printr-un pipe si trimite orin socket-ul deschis catre copilul serverului totul. In acelasi timp acesta citeste tot ce trimite serverul ca si raspuns, adica output-ul comenzilor, pe care il pune in alt pipe ce duce la Client, ca acesta sa afiseze pe consola potrivita. Pot rula mai multi clienti simultan.
+\newpage
+\subsection{Diagrama de comunicare}
+\begin{center}
+\includegraphics[scale=0.75]{ProcessHierarchy.png}
+\end{center}
+\newpage
+\subsection{Diagrama ordinii de shutdown}
+\begin{center}
+\includegraphics[scale=0.75]{ShutdownOrder.png}
+\end{center}
+
+\newpage
+\section{Detalii de implementare}
+Serverul, conform ierarhiei de mai sus va avea grija de copiii sai prin intermediul unui SIGCHLD cand acestia se inchid. Acest handler se propaga si este folosit si de catre nepoti, etc. ai procesului Server, deci daca oricare din ei primeste comanda de shutdown, va trimite SIGINT la copiii lui si apoi va astepta ca acestia sa se inchida, dupa care se va inchide dand un semnal parintelui sau, pentru ca acesta sa se ocupe de el.\newline
+
+Pe client acest lucru nu este necesar intrucat clientul este constituit dintr-un singur proces.\newline
+
+Pentru a rezolva problema clientului deconectat care a parasit sesiunea fara sa ii comunice acest lucru serverului, am eliminat caile amiabile de shutdown si am lasat doar un timeout pe server, care va inchide conexiunea daca clientul nu raspunde in timp util.\newline
+In acelasi timp, daca serverul se inchide toti clientii se vor inchide la urmatorul refresh.\newline
+
+\newpage
+
+Interfata text-grafica va fi implementata cu ajutorul librariei ncurses. In momentul actual, fiecare fereastra fiind pozitionata dupa un algoritm simplu:\newline
+\begin{center}Cand se umple spatiul de NxM console (Matrice), se mai adauga un rand/coloana in mod alternativ (coloana$\rightarrow$rand$\rightarrow$coloana$\rightarrow$...)
+\end{center}
+
+Exemplu algoritm:
+\begin{lstlisting}
+void Client::resize_event() {
+    int CONSOLE_H, CONSOLE_W;
+    getmaxyx(stdscr, CONSOLE_H, CONSOLE_W);
+    int window_count = children.size();
+    int rows = 0, cols = 0;
+    int i = 0, j = 0;
+    WINDOW_DESC w_desc;
+
+    while(rows*cols < window_count)
+        if(cols > rows)
+            rows++;
+        else
+            cols++;
+
+    erase();
+    for(Child &child: children){
+        if(j >= cols || i*cols + j >= window_count){
+            i++; j = 0;
+        }
+        if(i >= rows)
+            break;
+        w_desc.height = (CONSOLE_H - 1) / rows;
+        w_desc.width = CONSOLE_W / cols;
+        w_desc.y = (CONSOLE_H - 1) / rows * i;
+        w_desc.x = CONSOLE_W / cols * j;
+        child.Set_Pos_Size(w_desc);
+        child.Resize_Event();
+        j++;
+    }
+}
+\end{lstlisting}
+
+\newpage
+\section{Concluzie}
+Proiectul a fost putin mai dificil decat ma asteptam, intrucat s-a dovedit time-consuming sa creezi un shell de la 0, lucru care mi-a dat batai de cap. Din acest motiv shell-ul este atat de minimal, intrucat nu poate decat sa execute comenzi simple si sa returneze output-ul acestora, fara pipe-uri, fara change directory, fara redirect. Cu ceva timp suplimentar as fi capabil sa introduc aceste functionalitati daca ar fi necesare.
+
+
+\begin{thebibliography}{8}
+\bibitem{ref_url1}
+https://linux.die.net/man/3/ncurses
+
+\bibitem{ref_url2}
+https://stackoverflow.com/
+
+\bibitem{ref_url3}
+https://www.linuxquestions.org
+
+\bibitem{ref_url4}
+https://www.geeksforgeeks.org/making-linux-shell-c/
+
+\bibitem{ref_url5}
+Alte surse/tutoriale de ncurses/tcp/shell.
+\end{thebibliography}
+\end{document}
