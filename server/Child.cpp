@@ -7,6 +7,7 @@
 #include <netinet/in.h>
 #include <sys/wait.h>
 #include <poll.h>
+#include <time.h>
 
 #include "../common/constants.h"
 #include "Child.h"
