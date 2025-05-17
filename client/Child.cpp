@@ -59,41 +59,39 @@ void Child::Set_Pos_Size(WINDOW_DESC w_desc) {
     cwd = w_desc;
 }
 
-bool Child::stream_screen_content(const char *send_buf, char *recv_buf){
-    fprintf(stderr, "this (stream_screen_content) = %p\n", (void*)this);
+int Child::stream_screen_content(const char *send_buf, char *recv_buf){
+    int8_t prot = PROTOCOL_STREAM;
+    int send_size = strlen(send_buf), recv_size;
 
-    // int8_t prot = PROTOCOL_STREAM;
-    // int send_size = strlen(send_buf), recv_size;
+    if(write(sd, &prot, sizeof(prot)) <= 0)
+        return -1;
+    prot = -1;
 
-    // if(write(sd, &prot, sizeof(prot)) <= 0)
-    //     return false;
-    // prot = -1;
+    if(read(sd, &prot, sizeof(prot)) < 0)
+        return -1;
 
-    // if(read(sd, &prot, sizeof(prot)) < 0)
-    //     return false;
+    if(PROTOCOL_STREAM != prot)
+        return -1;
 
-    // if(PROTOCOL_STREAM != prot)
-    //     return false;
+    write(sd, &send_size, sizeof(send_size));
 
-    // write(sd, &send_size, sizeof(send_size));
+    if(send_size > 0)
+        write(sd, send_buf, send_size);
 
-    // if(send_size > 0)
-    //     write(sd, send_buf, send_size);
-
-    // read(sd, &recv_size, sizeof(recv_size));
-    // if(recv_size > 0){
-    //     read(sd, recv_buf, recv_size*sizeof(recv_buf[0]));
-    // }
+    read(sd, &recv_size, sizeof(recv_size));
+    if(recv_size > 0){
+        read(sd, recv_buf, recv_size*sizeof(recv_buf[0]));
+    }
+    return recv_size;
 }
 
 void Child::loop() {
-    fprintf(stderr, "this (loop) = %p\n", (void*)this);
     piped_char = 0;
     read(screen_stdin[PIPE_READ], &piped_char, sizeof(piped_char));
     input_buffer[input_pos] = piped_char;
     switch(piped_char){
         case 0:{
-            stream_screen_content(input_buffer, output_buffer);
+            this->stream_screen_content(input_buffer, output_buffer);
             break;
         }
         case '\n':{

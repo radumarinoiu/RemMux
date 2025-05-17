@@ -198,12 +198,6 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Application.RemMux_Client" />
-      <item itemvalue="Application.RemMux_Server" />
-      <item itemvalue="Application.RemMux_Shell" />
-      <item itemvalue="Application.Client Run in Console" />
-      <item itemvalue="Application.Server Run in Console" />
-      <item itemvalue="Application.Shell Run in Console" />
       <item itemvalue="Compound.Run App" />
     </list>
   </component>

@@ -21,7 +21,7 @@ private:
     char output_buffer[BUFFER_SIZE];
 
 //    bool connect_to_server();
-    bool stream_screen_content(
+    int stream_screen_content(
             const char *send_buf,
             char *recv_buf);
 

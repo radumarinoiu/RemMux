@@ -49,13 +49,12 @@ bool Server::Start_Listening() {
         switch (recv_cmd){
             case PROTOCOL_CREATE_SESSION:{
                 perror("New child");
-                Child child(child_sd);
-                children.push_back(child);
+                children.push_back(std::make_unique<Child>(child_sd));
                 break;
             }
             case PROTOCOL_INITIATE_SHUTDOWN:{
-                for(auto child: children){
-                    child.Shutdown();
+                for(auto &child: children){
+                    child->Shutdown();
                 }
                 run = false;
                 break;

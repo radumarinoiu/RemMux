@@ -49,10 +49,7 @@ void Client::Loop() {
             break;
     }
     for(auto &child: children)
-    {
-        fprintf(stderr, "client (loop) = %p\n", (void*)&child);
         child->loop();
-    }
     children[focused_child]->Focus_Window();
 }
 
@@ -94,8 +91,7 @@ void Client::Create_Child() {
     if(connect(sd, (sockaddr*)&server, sizeof(sockaddr)) == -1){
         perror("[client] Error connecting to server.\n");
     }
-    auto child_ptr = std::make_unique<Child>(sd);
-    children.push_back(std::move(child_ptr));
+    children.push_back(std::make_unique<Child>(sd));
     resize_event();
 }
 

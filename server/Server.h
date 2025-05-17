@@ -6,6 +6,7 @@
 #define REMMUX_SERVER_H
 
 #include "Child.h"
+#include <memory>
 
 
 class Server {
@@ -13,7 +14,7 @@ private:
     int sd;
     sockaddr_in listener, client;
     socklen_t client_size = sizeof(client);
-    std::list<Child> children;
+    std::vector<std::unique_ptr<Child>> children;
 
 public:
     Server(int port);
