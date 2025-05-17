@@ -1,0 +1,48 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+        "name": "Debug RemMux_Client",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/RemMux_Client",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "preLaunchTask": "Build with CMake",
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            }
+        ]
+    },
+    {
+        "name": "Run RemMux_Server (no debug)",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/RemMux_Server",
+        "args": [],
+        "stopAtEntry": false,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [],
+        "debug": false
+    }
+  ],
+  "compounds": [
+    {
+        "name": "Run Server (no debug) + Debug Client",
+        "configurations": [
+            "Run RemMux_Server (no debug)",
+            "Debug RemMux_Client"
+        ]
+    }
+  ]
+}
