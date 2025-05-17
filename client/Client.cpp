@@ -37,20 +37,23 @@ void Client::Loop() {
             read_command();
             break;
         case 32 ... 126:
-            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
+            write(children[focused_child]->Get_Child_Stdin(), &input, sizeof(input));
             break;
         case '\n':
-            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
+            write(children[focused_child]->Get_Child_Stdin(), &input, sizeof(input));
             break;
         case KEY_BACKSPACE:
-            write(children[focused_child].Get_Child_Stdin(), &input, sizeof(input));
+            write(children[focused_child]->Get_Child_Stdin(), &input, sizeof(input));
             break;
         default:
             break;
     }
-    for(Child &child: children)
-        child.loop();
-    children[focused_child].Focus_Window();
+    for(auto &child: children)
+    {
+        fprintf(stderr, "client (loop) = %p\n", (void*)&child);
+        child->loop();
+    }
+    children[focused_child]->Focus_Window();
 }
 
 void Client::resize_event() {
@@ -59,7 +62,6 @@ void Client::resize_event() {
     int window_count = children.size();
     int rows = 0, cols = 0;
     int i = 0, j = 0;
-    WINDOW_DESC w_desc;
 
     while(rows*cols < window_count)
         if(cols > rows)
@@ -68,18 +70,19 @@ void Client::resize_event() {
             cols++;
 
     erase();
-    for(Child &child: children){
+    for(auto &child_ptr: children){
         if(j >= cols || i*cols + j >= window_count){
             i++; j = 0;
         }
         if(i >= rows)
             break;
+        WINDOW_DESC w_desc;
         w_desc.height = (CONSOLE_H - 1) / rows;
         w_desc.width = CONSOLE_W / cols;
         w_desc.y = (CONSOLE_H - 1) / rows * i;
         w_desc.x = CONSOLE_W / cols * j;
-        child.Set_Pos_Size(w_desc);
-        child.Resize_Event();
+        child_ptr->Set_Pos_Size(w_desc);
+        child_ptr->Resize_Event();
         j++;
     }
 }
@@ -91,8 +94,8 @@ void Client::Create_Child() {
     if(connect(sd, (sockaddr*)&server, sizeof(sockaddr)) == -1){
         perror("[client] Error connecting to server.\n");
     }
-    Child child(sd);
-    children.push_back(child);
+    auto child_ptr = std::make_unique<Child>(sd);
+    children.push_back(std::move(child_ptr));
     resize_event();
 }
 
@@ -163,7 +166,7 @@ void Client::read_command() {
         if(new_child_focus < children.size()){
             focused_child = new_child_focus;
             mvprintw(cursor_y, cursor_x, "Selected %d", focused_child);
-            children[focused_child].Focus_Window();
+            children[focused_child]->Focus_Window();
         }
         else
             mvprintw(cursor_y, cursor_x, "Child %d does not exist!", new_child_focus);

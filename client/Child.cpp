@@ -38,9 +38,18 @@ void Child::Refresh_Window() {
 }
 
 void Child::Redraw_Window() {
-    wclear(child_window);
+    if (child_window != nullptr)
+    {
+        wclear(child_window);
+        delwin(child_window);
+    }
     child_window = newwin(cwd.height, cwd.width, cwd.y, cwd.x);
     box(child_window, 0, 0);
+    if (tty_window != nullptr)
+    {
+        wclear(tty_window);
+        delwin(tty_window);
+    }
     tty_window = newwin(cwd.height-2, cwd.width-2, cwd.y+1, cwd.x+1);
     scrollok(tty_window, true);
     Refresh_Window();
@@ -51,37 +60,40 @@ void Child::Set_Pos_Size(WINDOW_DESC w_desc) {
 }
 
 bool Child::stream_screen_content(const char *send_buf, char *recv_buf){
-    int8_t prot = PROTOCOL_STREAM;
-    int send_size = strlen(send_buf), recv_size;
+    fprintf(stderr, "this (stream_screen_content) = %p\n", (void*)this);
 
-    if(write(sd, &prot, sizeof(prot)) <= 0)
-        return false;
-    prot = -1;
+    // int8_t prot = PROTOCOL_STREAM;
+    // int send_size = strlen(send_buf), recv_size;
 
-    if(read(sd, &prot, sizeof(prot)) < 0)
-        return false;
+    // if(write(sd, &prot, sizeof(prot)) <= 0)
+    //     return false;
+    // prot = -1;
 
-    if(PROTOCOL_STREAM != prot)
-        return false;
+    // if(read(sd, &prot, sizeof(prot)) < 0)
+    //     return false;
 
-    write(sd, &send_size, sizeof(send_size));
+    // if(PROTOCOL_STREAM != prot)
+    //     return false;
 
-    if(send_size > 0)
-        write(sd, send_buf, send_size);
+    // write(sd, &send_size, sizeof(send_size));
 
-    read(sd, &recv_size, sizeof(recv_size));
-    if(recv_size > 0){
-        read(sd, recv_buf, recv_size*sizeof(recv_buf[0]));
-    }
+    // if(send_size > 0)
+    //     write(sd, send_buf, send_size);
+
+    // read(sd, &recv_size, sizeof(recv_size));
+    // if(recv_size > 0){
+    //     read(sd, recv_buf, recv_size*sizeof(recv_buf[0]));
+    // }
 }
 
 void Child::loop() {
+    fprintf(stderr, "this (loop) = %p\n", (void*)this);
     piped_char = 0;
     read(screen_stdin[PIPE_READ], &piped_char, sizeof(piped_char));
     input_buffer[input_pos] = piped_char;
     switch(piped_char){
         case 0:{
-            stream_screen_content("", output_buffer);
+            stream_screen_content(input_buffer, output_buffer);
             break;
         }
         case '\n':{

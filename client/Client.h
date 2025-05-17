@@ -6,13 +6,14 @@
 #define REMMUX_CLIENT_H
 
 #include "Child.h"
+#include <memory>
 
 
 class Client{
 private:
     int sd;
     sockaddr_in server;
-    std::vector<Child> children;
+    std::vector<std::unique_ptr<Child>> children;
     int input;
     int command_mode = 0;
     int focused_child = 0;
